@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from '../components/Header';
 import { Button } from '@/components/ui/button';
@@ -46,6 +47,8 @@ const TrackingPage = () => {
   
   const navigate = useNavigate();
   const { toast } = useToast();
+  const medicationTabRef = useRef<HTMLButtonElement>(null);
+  const symptomsTabRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     // Check if there's a saved diagnosis report
@@ -153,6 +156,18 @@ const TrackingPage = () => {
     });
   };
 
+  const navigateToMedicationsTab = () => {
+    if (medicationTabRef.current) {
+      medicationTabRef.current.click();
+    }
+  };
+
+  const navigateToSymptomsTab = () => {
+    if (symptomsTabRef.current) {
+      symptomsTabRef.current.click();
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -168,8 +183,8 @@ const TrackingPage = () => {
         <Tabs defaultValue="overview">
           <TabsList className="mb-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="medications">Medications</TabsTrigger>
-            <TabsTrigger value="symptoms">Symptoms</TabsTrigger>
+            <TabsTrigger value="medications" ref={medicationTabRef}>Medications</TabsTrigger>
+            <TabsTrigger value="symptoms" ref={symptomsTabRef}>Symptoms</TabsTrigger>
           </TabsList>
           
           <TabsContent value="overview">
@@ -309,10 +324,8 @@ const TrackingPage = () => {
                                   ? "You have medication reminders set up."
                                   : "No medications added yet. Add your first medication."}
                               </p>
-                              <Button variant="outline" asChild className="w-full" size="sm">
-                                <Link to="#medications" onClick={() => document.querySelector('[value="medications"]')?.click()}>
-                                  Manage Medications
-                                </Link>
+                              <Button variant="outline" className="w-full" size="sm" onClick={navigateToMedicationsTab}>
+                                Manage Medications
                               </Button>
                             </CardContent>
                           </Card>
@@ -328,10 +341,8 @@ const TrackingPage = () => {
                               <p className="text-sm text-gray-600 mb-3">
                                 Record and track your symptoms over time.
                               </p>
-                              <Button variant="outline" asChild className="w-full" size="sm">
-                                <Link to="#symptoms" onClick={() => document.querySelector('[value="symptoms"]')?.click()}>
-                                  Track Symptoms
-                                </Link>
+                              <Button variant="outline" className="w-full" size="sm" onClick={navigateToSymptomsTab}>
+                                Track Symptoms
                               </Button>
                             </CardContent>
                           </Card>
@@ -410,7 +421,7 @@ const TrackingPage = () => {
                         <h4 className="font-medium">Health Data Privacy</h4>
                       </div>
                       <p className="text-xs text-gray-600">
-                        Your health data is stored locally on your device. HealthAssist AI does not 
+                        Your health data is stored locally on your device. IBRAHsoft HEALTHCARE CENTRE does not 
                         transmit or share your personal health information with third parties.
                       </p>
                     </div>

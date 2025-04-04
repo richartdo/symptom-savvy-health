@@ -5,9 +5,10 @@ import Header from '../components/Header';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MapPin, Search, Navigation, BuildingHospital, Phone, Clock, Info } from "lucide-react";
+import { MapPin, Search, Navigation, Building, Phone, Clock, Info } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 
 // Sample data for dropdown selections
 const regions = ["Africa", "Asia", "Europe", "North America", "South America", "Australia/Oceania"];
@@ -286,7 +287,7 @@ const MapPage = () => {
           <div className="lg:col-span-2">
             <div className="mb-6 bg-white rounded-lg shadow-md p-4 h-64 flex items-center justify-center">
               <div className="text-center text-gray-500">
-                <BuildingHospital className="h-12 w-12 mx-auto mb-2 text-blue-400" />
+                <Building className="h-12 w-12 mx-auto mb-2 text-blue-400" />
                 <p>Map will display here once location is selected</p>
               </div>
             </div>
@@ -309,7 +310,7 @@ const MapPage = () => {
                             <span>{facility.address} ({facility.distance})</span>
                           </div>
                         </div>
-                        <Badge className="bg-blue-100 text-blue-700 border-blue-200 px-2 py-0.5 text-xs rounded-full">
+                        <Badge className="bg-blue-100 text-blue-700 border-blue-200">
                           {facility.type}
                         </Badge>
                       </div>
