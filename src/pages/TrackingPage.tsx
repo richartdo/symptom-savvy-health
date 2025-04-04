@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import Header from '../components/Header';
@@ -11,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
-import { Calendar, Clock, Bell, Info, Heart, AlertTriangle, Check, X } from 'lucide-react';
+import { Calendar, Clock, Bell, Info, Heart, AlertTriangle, Check, X, Activity } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 type Medication = {
@@ -722,7 +721,7 @@ const TrackingPage = () => {
       
       <footer className="bg-white border-t py-6">
         <div className="container text-center text-gray-500 text-sm">
-          © {new Date().getFullYear()} HealthAssist AI. All rights reserved.
+          © {new Date().getFullYear()} IBRAHsoft HEALTHCARE CENTRE. All rights reserved.
         </div>
       </footer>
     </div>

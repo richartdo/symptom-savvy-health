@@ -11,7 +11,7 @@ const Header = () => {
     <header className="bg-white shadow-sm py-4">
       <div className="container flex items-center justify-between">
         <Link to="/" className="text-2xl font-bold text-health-primary">
-          HealthAssist AI
+          IBRAHsoft HEALTHCARE CENTRE
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6">
