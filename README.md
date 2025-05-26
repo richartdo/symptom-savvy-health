@@ -1,73 +1,80 @@
-# Welcome to your Lovable project
+# 🤖 Symptom Savvy Health – AI-Powered Personal Health Assistant
 
-## Project info
+🌐 **Live Demo**: [symptom-savvy-health.vercel.app](https://symptom-savvy-health.vercel.app/)  
+🔗 **Project on Lovable**: [View Project](https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6)
 
-**URL**: https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6
+---
 
-## How can I edit this code?
+## 🩺 Overview
 
-There are several ways of editing your application.
+**Symptom Savvy Health** is an AI-powered personal health assistant designed to help users monitor their health, understand symptoms, and stay on top of medication routines. Whether you're experiencing mild discomfort or need help communicating symptoms through sign language, our tool gives you a personalized experience to better manage your health.
 
-**Use Lovable**
+---
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6) and start prompting.
+## 🚀 How It Works
 
-Changes made via Lovable will be committed automatically to this repo.
+1. **Register/Login**  
+   Create an account or log in if you already have one.
 
-**Use your preferred IDE**
+2. **Input Your Health Info**  
+   - Enter your basic details (name, age bracket).
+   - Select or type in your symptoms.
+   - Optionally upload a **sign language video** for better accessibility.
+   - Add specific health questions or details.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. **Submit for AI Analysis**  
+   Our AI processes your input and generates a health insight report tailored to you.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+4. **Receive & Review Report**  
+   Gain insights and suggested next steps for your health condition.
 
-Follow these steps:
+5. **Track Your Health**  
+   - Set up symptom tracking
+   - Receive daily medication reminders
+   - Monitor trends for early detection
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 📈 Health Tracking Benefits
 
-# Step 3: Install the necessary dependencies.
-npm i
+- Track your health patterns over time.
+- Never miss a dose with helpful medication reminders.
+- Provide better data to your healthcare providers.
+- Get alerts for early signs of health changes.
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+---
 
-**Edit a file directly in GitHub**
+## 💊 Medication Tips
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Take medications at the **same time daily** to build a routine.
+- Know whether to take with or without food.
+- Store properly – cool, dry place unless instructed otherwise.
+- Always disclose all medications and supplements to your doctor.
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🛠️ Tech Stack
 
-## What technologies are used for this project?
+- [Vite](https://vitejs.dev/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [React](https://reactjs.org/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [shadcn/ui](https://ui.shadcn.com/)
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 💻 Development
 
-## How can I deploy this project?
+### Option 1: Using [Lovable](https://lovable.dev)
 
-Simply open [Lovable](https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6) and click on Share -> Publish.
+- Open the project at [Symptom Savvy on Lovable](https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6)
+- Start prompting or editing directly.
+- Changes will auto-commit to the repo.
 
-## Can I connect a custom domain to my Lovable project?
+### Option 2: Using your local IDE
 
-Yes it is!
+1. **Clone the repository**
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+   ```bash
+   git clone <YOUR_GIT_URL>
+   cd <YOUR_PROJECT_NAME>
