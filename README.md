@@ -1,7 +1,9 @@
-# 🤖 Symptom Savvy Health – AI-Powered Personal Health Assistant
+# 🤖 PORTABLE HEALTH CENTRE – AI-Powered Personal Health Assistant
 
 🌐 **Live Demo**: [symptom-savvy-health.vercel.app](https://symptom-savvy-health.vercel.app/)  
-🔗 **Project on Lovable**: [View Project](https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6)
+🔗 **Project on Lovable+supabase**: [View Project](https://lovable.dev/projects/a743ec14-3afa-4350-a513-4a1380ed12d6)
+🔗 **Project on Bolt.new**: [View Project](https://bolt.new/~/github-qn9wz8ny)
+
 
 ---
 
