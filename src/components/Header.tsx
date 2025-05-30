@@ -2,7 +2,7 @@
 import { Link } from 'react-router-dom';
 import { useUser } from '../contexts/UserContext';
 import { Button } from '@/components/ui/button';
-import { UserIcon } from 'lucide-react';
+import { UserIcon, Heart } from 'lucide-react';
 
 const Header = () => {
   const { user, logout } = useUser();
@@ -10,8 +10,18 @@ const Header = () => {
   return (
     <header className="bg-white shadow-sm py-4">
       <div className="container flex items-center justify-between">
-        <Link to="/" className="text-2xl font-bold text-health-primary">
-          PORTABLE HEALTH CENTRE
+        <Link to="/" className="flex items-center space-x-2 group">
+          <div className="h-10 w-10 bg-gradient-to-br from-health-primary to-health-secondary rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+            <Heart className="h-6 w-6 text-white" />
+          </div>
+          <div className="flex flex-col">
+            <span className="text-xl font-bold text-health-primary leading-tight tracking-wide">
+              PORTABLE
+            </span>
+            <span className="text-sm font-semibold text-health-secondary -mt-1 tracking-widest">
+              HEALTH CENTRE
+            </span>
+          </div>
         </Link>
         
         <nav className="hidden md:flex items-center space-x-6">
