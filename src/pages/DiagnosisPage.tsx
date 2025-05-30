@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
@@ -10,6 +9,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { X, Loader2, Upload, Languages, List, AlertTriangle, Globe } from 'lucide-react';
+import { generateDiagnosis, translateText, analyzeSignLanguageVideo, DiagnosisRequest } from '../services/geminiService';
 
 // Mock symptoms for the dropdown
 const commonSymptoms = [
@@ -79,21 +79,45 @@ const DiagnosisPage = () => {
     setSelectedSymptoms(selectedSymptoms.filter(s => s !== symptom));
   };
   
-  const handleVideoUpload = () => {
+  const handleVideoUpload = async () => {
     setVideoUploading(true);
     
-    // Simulate video upload
-    setTimeout(() => {
-      setHasVideo(true);
+    try {
+      // Simulate video upload and analysis
+      setTimeout(async () => {
+        try {
+          const mockVideoDescription = "Person showing signs of head pain and tiredness through gestures";
+          const extractedSymptoms = await analyzeSignLanguageVideo(mockVideoDescription);
+          
+          setHasVideo(true);
+          setVideoUploading(false);
+          toast({
+            title: "Video uploaded successfully",
+            description: "Your sign language video has been processed.",
+          });
+          
+          // Add extracted symptoms
+          const newSymptoms = [...selectedSymptoms, ...extractedSymptoms].filter((symptom, index, self) => 
+            self.indexOf(symptom) === index
+          );
+          setSelectedSymptoms(newSymptoms);
+        } catch (error) {
+          setVideoUploading(false);
+          toast({
+            title: "Video processing failed",
+            description: "There was an error processing your video. Please try again.",
+            variant: "destructive",
+          });
+        }
+      }, 2000);
+    } catch (error) {
       setVideoUploading(false);
       toast({
-        title: "Video uploaded successfully",
-        description: "Your sign language video has been processed.",
+        title: "Upload failed",
+        description: "Failed to upload video. Please try again.",
+        variant: "destructive",
       });
-      
-      // Auto-populate some symptoms based on the "video"
-      setSelectedSymptoms([...selectedSymptoms, "Headache", "Fatigue"]);
-    }, 2000);
+    }
   };
   
   const handleSubmit = async (e: React.FormEvent) => {
@@ -111,21 +135,20 @@ const DiagnosisPage = () => {
     setIsSubmitting(true);
     
     try {
-      const diagnosisData = {
+      const diagnosisData: DiagnosisRequest = {
         name,
         age: parseInt(age),
-        language: selectedLanguage,
         symptoms: selectedSymptoms,
         additionalInfo,
-        hasVideo
+        language: selectedLanguage
       };
       
-      const result = await mockDiagnosisAPI(diagnosisData);
+      const result = await generateDiagnosis(diagnosisData);
       setDiagnosisResult(result);
       
       toast({
-        title: "Diagnosis report generated",
-        description: "AI has analyzed your symptoms and provided insights.",
+        title: "AI diagnosis complete",
+        description: "Gemini AI has analyzed your symptoms and provided insights.",
       });
     } catch (error) {
       toast({
