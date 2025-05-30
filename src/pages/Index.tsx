@@ -42,7 +42,7 @@ const Index = () => {
         {/* Features Section */}
         <section className="py-20 bg-white">
           <div className="container">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">How Portable health centre Works</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">How PORTABLE HEALTH CENTRE Works</h2>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {/* Feature 1 */}
@@ -136,7 +136,7 @@ const Index = () => {
         <div className="container">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-300 mb-4 md:mb-0">
-              © {new Date().getFullYear()} Portable health centre. All rights reserved.
+              © {new Date().getFullYear()} PORTABLE HEALTH CENTRE. All rights reserved.
             </p>
             <div className="flex space-x-6">
               <a href="#" className="text-sm text-gray-300 hover:text-white">Privacy Policy</a>

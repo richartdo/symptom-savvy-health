@@ -23,7 +23,7 @@ const Login = () => {
       await login(email, password);
       toast({
         title: "Login successful",
-        description: "Welcome back to HealthAssist AI!",
+        description: "Welcome back to PORTABLE HEALTH CENTRE!",
       });
       navigate('/dashboard');
     } catch (error) {

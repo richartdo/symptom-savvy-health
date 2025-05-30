@@ -167,7 +167,7 @@ const Dashboard = () => {
       
       <footer className="bg-white border-t py-6">
         <div className="container text-center text-gray-500 text-sm">
-          © {new Date().getFullYear()} HealthAssist AI. All rights reserved.
+          © {new Date().getFullYear()} PORTABLE HEALTH CENTRE. All rights reserved.
         </div>
       </footer>
     </div>
