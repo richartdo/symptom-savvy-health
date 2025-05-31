@@ -226,31 +226,51 @@ export const generateFirstAidGuidance = async (diagnosisResult: DiagnosisRespons
 Based on the following possible medical conditions: ${conditions}
 Urgency level: ${diagnosisResult.urgencyLevel}
 
-Provide specific first aid guidance in JSON format:
+Provide specific first aid guidance in JSON format. Each immediate step should be a simple string, not an object:
 {
   "immediateSteps": [
-    "Specific immediate actions to take",
-    "Step-by-step first aid instructions",
-    "Safety precautions"
+    "Simple string instruction 1",
+    "Simple string instruction 2",
+    "Simple string instruction 3"
   ],
   "warningSigns": [
-    "Signs that indicate worsening condition",
-    "Red flag symptoms to watch for"
+    "Simple string warning sign 1",
+    "Simple string warning sign 2"
   ],
-  "whenToSeekHelp": "Clear guidance on when to call emergency services or see a doctor"
+  "whenToSeekHelp": "Simple string guidance on when to call emergency services or see a doctor"
 }
 
-Focus on practical, actionable first aid steps that are safe for the general public to perform.
+Focus on practical, actionable first aid steps that are safe for the general public to perform. 
+IMPORTANT: Each array element should be a simple string, not an object with properties.
 `;
 
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
     
+    console.log('First aid guidance response:', text);
+    
     try {
       const cleanText = text.replace(/```json\n?|```\n?/g, '').trim();
-      return JSON.parse(cleanText);
+      const parsedResponse = JSON.parse(cleanText);
+      
+      // Ensure all array elements are strings
+      const normalizedResponse = {
+        immediateSteps: Array.isArray(parsedResponse.immediateSteps) 
+          ? parsedResponse.immediateSteps.map(step => typeof step === 'string' ? step : String(step))
+          : ["Ensure the person is in a comfortable position", "Monitor vital signs and consciousness level"],
+        warningSigns: Array.isArray(parsedResponse.warningSigns)
+          ? parsedResponse.warningSigns.map(sign => typeof sign === 'string' ? sign : String(sign))
+          : ["Difficulty breathing", "Severe pain"],
+        whenToSeekHelp: typeof parsedResponse.whenToSeekHelp === 'string' 
+          ? parsedResponse.whenToSeekHelp 
+          : "Seek medical attention if symptoms worsen or persist."
+      };
+      
+      console.log('Normalized first aid response:', normalizedResponse);
+      return normalizedResponse;
     } catch (parseError) {
+      console.error('Failed to parse first aid guidance:', parseError);
       // Fallback first aid guidance
       return {
         immediateSteps: [

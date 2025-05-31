@@ -157,6 +157,7 @@ const DiagnosisPage = () => {
       setLoadingFirstAid(true);
       try {
         const firstAidResult = await generateFirstAidGuidance(result);
+        console.log('First aid guidance result:', firstAidResult);
         setFirstAidGuidance(firstAidResult);
       } catch (firstAidError) {
         console.error('Error generating first aid guidance:', firstAidError);
@@ -555,8 +556,10 @@ const DiagnosisPage = () => {
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold mb-2 text-health-accent">Immediate Steps to Take</h3>
                       <ol className="list-decimal pl-5 space-y-2">
-                        {firstAidGuidance.immediateSteps.map((step: string, index: number) => (
-                          <li key={index} className="text-gray-700">{step}</li>
+                        {Array.isArray(firstAidGuidance.immediateSteps) && firstAidGuidance.immediateSteps.map((step: any, index: number) => (
+                          <li key={index} className="text-gray-700">
+                            {typeof step === 'string' ? step : JSON.stringify(step)}
+                          </li>
                         ))}
                       </ol>
                     </div>
@@ -564,8 +567,10 @@ const DiagnosisPage = () => {
                     <div className="mb-6">
                       <h3 className="text-lg font-semibold mb-2 text-red-600">Warning Signs to Watch For</h3>
                       <ul className="list-disc pl-5 space-y-1">
-                        {firstAidGuidance.warningSigns.map((sign: string, index: number) => (
-                          <li key={index} className="text-gray-700">{sign}</li>
+                        {Array.isArray(firstAidGuidance.warningSigns) && firstAidGuidance.warningSigns.map((sign: any, index: number) => (
+                          <li key={index} className="text-gray-700">
+                            {typeof sign === 'string' ? sign : JSON.stringify(sign)}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -576,7 +581,10 @@ const DiagnosisPage = () => {
                         <h3 className="font-semibold text-red-800">When to Seek Medical Help</h3>
                       </div>
                       <p className="text-red-700">
-                        {firstAidGuidance.whenToSeekHelp}
+                        {typeof firstAidGuidance.whenToSeekHelp === 'string' 
+                          ? firstAidGuidance.whenToSeekHelp 
+                          : JSON.stringify(firstAidGuidance.whenToSeekHelp)
+                        }
                       </p>
                     </div>
                   </CardContent>
