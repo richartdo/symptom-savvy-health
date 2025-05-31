@@ -7,9 +7,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { useToast } from '@/components/ui/use-toast';
-import { X, Loader2, Upload, Languages, List, AlertTriangle, Globe } from 'lucide-react';
-import { generateDiagnosis, translateText, analyzeSignLanguageVideo, DiagnosisRequest } from '../services/geminiService';
+import { useToast } from '@/hooks/use-toast';
+import { X, Loader2, Upload, Languages, List, AlertTriangle, Globe, Heart } from 'lucide-react';
+import { generateDiagnosis, generateFirstAidGuidance, translateText, analyzeSignLanguageVideo, DiagnosisRequest } from '../services/geminiService';
 
 // Mock symptoms for the dropdown
 const commonSymptoms = [
@@ -64,6 +64,8 @@ const DiagnosisPage = () => {
   const [videoUploading, setVideoUploading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [diagnosisResult, setDiagnosisResult] = useState<any>(null);
+  const [firstAidGuidance, setFirstAidGuidance] = useState<any>(null);
+  const [loadingFirstAid, setLoadingFirstAid] = useState(false);
   
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -151,9 +153,20 @@ const DiagnosisPage = () => {
       
       setDiagnosisResult(result);
       
+      // Generate first aid guidance automatically
+      setLoadingFirstAid(true);
+      try {
+        const firstAidResult = await generateFirstAidGuidance(result);
+        setFirstAidGuidance(firstAidResult);
+      } catch (firstAidError) {
+        console.error('Error generating first aid guidance:', firstAidError);
+      } finally {
+        setLoadingFirstAid(false);
+      }
+      
       toast({
         title: "AI diagnosis complete",
-        description: "Gemini AI has analyzed your symptoms and provided insights.",
+        description: "Gemini AI has analyzed your symptoms and provided insights with first aid guidance.",
       });
     } catch (error) {
       console.error('Error in handleSubmit:', error);
@@ -181,7 +194,7 @@ const DiagnosisPage = () => {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">AI Diagnosis Assistant</h1>
           <p className="text-gray-600">
-            Describe your symptoms and our AI will analyze them to provide health insights. 
+            Describe your symptoms and our AI will analyze them to provide health insights with personalized first aid recommendations. 
             Remember, this is not a replacement for professional medical advice.
           </p>
         </div>
@@ -401,13 +414,13 @@ const DiagnosisPage = () => {
                       <div className="h-5 w-5 bg-health-primary text-white rounded-full flex items-center justify-center text-xs font-medium shrink-0">
                         4
                       </div>
-                      <p>Submit your information for AI analysis and receive insights about your health.</p>
+                      <p>Receive AI analysis with specific medical insights and personalized first aid guidance.</p>
                     </li>
                     <li className="flex gap-2">
                       <div className="h-5 w-5 bg-health-primary text-white rounded-full flex items-center justify-center text-xs font-medium shrink-0">
                         5
                       </div>
-                      <p>After receiving your report, you can set up health tracking and reminders.</p>
+                      <p>Set up health tracking and access emergency resources as needed.</p>
                     </li>
                   </ol>
                   
@@ -427,7 +440,7 @@ const DiagnosisPage = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 space-y-6">
               <Card className="shadow-md">
                 <CardContent className="pt-6">
                   <div className="mb-6">
@@ -488,7 +501,10 @@ const DiagnosisPage = () => {
                   <div className="flex flex-col sm:flex-row gap-3 justify-between border-t pt-4">
                     <Button
                       variant="outline"
-                      onClick={() => setDiagnosisResult(null)}
+                      onClick={() => {
+                        setDiagnosisResult(null);
+                        setFirstAidGuidance(null);
+                      }}
                     >
                       Start New Diagnosis
                     </Button>
@@ -498,7 +514,7 @@ const DiagnosisPage = () => {
                         onClick={() => navigate('/first-aid')}
                         className="border-health-accent text-health-accent hover:bg-health-accent/10"
                       >
-                        First Aid Guidance
+                        General First Aid
                       </Button>
                       <Button 
                         className="bg-health-secondary hover:bg-health-secondary/90"
@@ -510,6 +526,62 @@ const DiagnosisPage = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* AI First Aid Guidance Card */}
+              {loadingFirstAid && (
+                <Card className="shadow-md">
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="mr-2 h-6 w-6 animate-spin text-health-primary" />
+                      <span className="text-gray-600">Generating personalized first aid guidance...</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
+
+              {firstAidGuidance && (
+                <Card className="shadow-md border-health-accent/20">
+                  <CardContent className="pt-6">
+                    <div className="mb-4">
+                      <h2 className="text-xl font-bold text-health-accent flex items-center">
+                        <Heart className="mr-2 h-5 w-5" />
+                        Personalized First Aid Guidance
+                      </h2>
+                      <p className="text-gray-600 text-sm mt-1">
+                        AI-generated first aid recommendations based on your possible conditions
+                      </p>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2 text-health-accent">Immediate Steps to Take</h3>
+                      <ol className="list-decimal pl-5 space-y-2">
+                        {firstAidGuidance.immediateSteps.map((step: string, index: number) => (
+                          <li key={index} className="text-gray-700">{step}</li>
+                        ))}
+                      </ol>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold mb-2 text-red-600">Warning Signs to Watch For</h3>
+                      <ul className="list-disc pl-5 space-y-1">
+                        {firstAidGuidance.warningSigns.map((sign: string, index: number) => (
+                          <li key={index} className="text-gray-700">{sign}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="p-4 bg-red-50 border border-red-100 rounded-md">
+                      <div className="flex items-center mb-2">
+                        <AlertTriangle className="h-5 w-5 mr-2 text-red-600" />
+                        <h3 className="font-semibold text-red-800">When to Seek Medical Help</h3>
+                      </div>
+                      <p className="text-red-700">
+                        {firstAidGuidance.whenToSeekHelp}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              )}
             </div>
             
             <div>
@@ -533,9 +605,9 @@ const DiagnosisPage = () => {
                     </div>
                     
                     <div className="p-3 bg-health-accent/5 rounded-md">
-                      <h4 className="font-medium mb-1">First aid guidance</h4>
+                      <h4 className="font-medium mb-1">General first aid guidance</h4>
                       <p className="text-sm text-gray-600 mb-3">
-                        Get immediate first aid guidance for common health issues and emergencies.
+                        Access comprehensive first aid guides for various health emergencies and conditions.
                       </p>
                       <Button 
                         size="sm" 
@@ -543,7 +615,7 @@ const DiagnosisPage = () => {
                         className="border-health-accent text-health-accent w-full hover:bg-health-accent/10"
                         onClick={() => navigate('/first-aid')}
                       >
-                        View First Aid Guide
+                        View General First Aid
                       </Button>
                     </div>
                     

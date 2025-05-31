@@ -127,7 +127,7 @@ const createSymptomBasedFallback = (symptoms: string[]): DiagnosisResponse => {
   
   // Generate specific conditions based on symptom patterns
   let conditions = [];
-  let urgency = 'Moderate';
+  let urgency: 'Low' | 'Moderate' | 'High' = 'Moderate';
   
   if (lowerSymptoms.includes('fever') && lowerSymptoms.includes('headache')) {
     conditions = [
@@ -210,6 +210,80 @@ const createSymptomBasedFallback = (symptoms: string[]): DiagnosisResponse => {
     urgencyLevel: urgency,
     disclaimer: "This AI assessment is for informational purposes only and does not constitute medical advice. Please consult with a qualified healthcare professional for proper diagnosis and treatment."
   };
+};
+
+export const generateFirstAidGuidance = async (diagnosisResult: DiagnosisResponse): Promise<{
+  immediateSteps: string[];
+  warningSigns: string[];
+  whenToSeekHelp: string;
+}> => {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const conditions = diagnosisResult.possibleConditions.map(c => c.name).join(', ');
+    
+    const prompt = `
+Based on the following possible medical conditions: ${conditions}
+Urgency level: ${diagnosisResult.urgencyLevel}
+
+Provide specific first aid guidance in JSON format:
+{
+  "immediateSteps": [
+    "Specific immediate actions to take",
+    "Step-by-step first aid instructions",
+    "Safety precautions"
+  ],
+  "warningSigns": [
+    "Signs that indicate worsening condition",
+    "Red flag symptoms to watch for"
+  ],
+  "whenToSeekHelp": "Clear guidance on when to call emergency services or see a doctor"
+}
+
+Focus on practical, actionable first aid steps that are safe for the general public to perform.
+`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    
+    try {
+      const cleanText = text.replace(/```json\n?|```\n?/g, '').trim();
+      return JSON.parse(cleanText);
+    } catch (parseError) {
+      // Fallback first aid guidance
+      return {
+        immediateSteps: [
+          "Ensure the person is in a comfortable position",
+          "Monitor vital signs and consciousness level",
+          "Keep the person calm and reassured",
+          "Do not give any medication unless prescribed"
+        ],
+        warningSigns: [
+          "Difficulty breathing or shortness of breath",
+          "Severe pain or worsening symptoms",
+          "Loss of consciousness or confusion",
+          "High fever or persistent vomiting"
+        ],
+        whenToSeekHelp: "Seek immediate medical attention if any warning signs appear or if symptoms worsen rapidly."
+      };
+    }
+  } catch (error) {
+    console.error('Error generating first aid guidance:', error);
+    return {
+      immediateSteps: [
+        "Ensure the person is in a comfortable position",
+        "Monitor vital signs and consciousness level",
+        "Keep the person calm and reassured"
+      ],
+      warningSigns: [
+        "Difficulty breathing",
+        "Severe pain",
+        "Loss of consciousness"
+      ],
+      whenToSeekHelp: "Seek medical attention if symptoms worsen or persist."
+    };
+  }
 };
 
 export const translateText = async (text: string, targetLanguage: string = 'en'): Promise<string> => {
