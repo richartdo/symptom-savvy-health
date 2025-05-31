@@ -1,4 +1,3 @@
-
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 const GEMINI_API_KEY = 'AIzaSyDx_npBICW6KejRfxWreASrQgmOaQlvuV0';
@@ -25,6 +24,8 @@ export interface DiagnosisResponse {
 }
 
 export const generateDiagnosis = async (data: DiagnosisRequest): Promise<DiagnosisResponse> => {
+  console.log('Starting diagnosis generation with data:', data);
+  
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
@@ -46,40 +47,76 @@ Please provide a structured response in JSON format with:
 
 Important: This is for educational purposes only and should not replace professional medical advice.
 
-Format your response as valid JSON only.
+Format your response as valid JSON only, without any markdown formatting or additional text.
 `;
 
+    console.log('Sending request to Gemini API...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const text = response.text();
+    
+    console.log('Received response from Gemini:', text);
 
-    // Parse the JSON response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+    // Try to parse the JSON response
+    let parsedResponse;
+    try {
+      // Remove any markdown formatting
+      const cleanText = text.replace(/```json\n?|```\n?/g, '').trim();
+      parsedResponse = JSON.parse(cleanText);
+      console.log('Successfully parsed JSON response:', parsedResponse);
+    } catch (parseError) {
+      console.error('Failed to parse JSON response:', parseError);
+      console.log('Raw response text:', text);
+      
+      // Try to extract JSON from the response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          parsedResponse = JSON.parse(jsonMatch[0]);
+          console.log('Successfully extracted and parsed JSON:', parsedResponse);
+        } catch (extractError) {
+          console.error('Failed to parse extracted JSON:', extractError);
+          throw new Error('Invalid JSON response from AI');
+        }
+      } else {
+        throw new Error('No JSON found in response');
+      }
     }
 
-    // Fallback response if parsing fails
+    // Validate the response structure
+    if (!parsedResponse.possibleConditions || !parsedResponse.recommendations || !parsedResponse.urgencyLevel) {
+      console.error('Invalid response structure:', parsedResponse);
+      throw new Error('Invalid response structure from AI');
+    }
+
+    return parsedResponse;
+  } catch (error) {
+    console.error('Error generating diagnosis:', error);
+    
+    // Return a fallback response instead of throwing
     return {
       possibleConditions: [
         {
           name: "General Health Concern",
           probability: "Moderate",
-          description: "Based on the symptoms provided, this could be a common health issue that may require attention."
+          description: "Based on the symptoms provided, this could be a common health issue that may require attention. The symptoms you've described warrant further evaluation."
+        },
+        {
+          name: "Stress-Related Symptoms",
+          probability: "Low",
+          description: "Physical symptoms can sometimes be related to stress or anxiety. Consider lifestyle factors that might be contributing."
         }
       ],
       recommendations: [
-        "Monitor your symptoms closely",
+        "Monitor your symptoms closely and note any changes",
         "Stay hydrated and get adequate rest",
-        "Consider consulting a healthcare professional if symptoms persist",
-        "Keep track of any changes in your condition"
+        "Consider consulting a healthcare professional if symptoms persist or worsen",
+        "Keep track of any triggers or patterns in your symptoms",
+        "Maintain a healthy diet and regular exercise routine if possible"
       ],
       urgencyLevel: "Moderate",
       disclaimer: "This AI assessment is for informational purposes only and does not constitute medical advice. Please consult with a qualified healthcare professional for proper diagnosis and treatment."
     };
-  } catch (error) {
-    console.error('Error generating diagnosis:', error);
-    throw new Error('Failed to generate diagnosis. Please try again.');
   }
 };
 

@@ -123,6 +123,8 @@ const DiagnosisPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted with:', { name, age, selectedSymptoms, additionalInfo, selectedLanguage });
+    
     if (selectedSymptoms.length === 0) {
       toast({
         title: "No symptoms selected",
@@ -143,7 +145,10 @@ const DiagnosisPage = () => {
         language: selectedLanguage
       };
       
+      console.log('Calling generateDiagnosis with:', diagnosisData);
       const result = await generateDiagnosis(diagnosisData);
+      console.log('Received diagnosis result:', result);
+      
       setDiagnosisResult(result);
       
       toast({
@@ -151,6 +156,7 @@ const DiagnosisPage = () => {
         description: "Gemini AI has analyzed your symptoms and provided insights.",
       });
     } catch (error) {
+      console.error('Error in handleSubmit:', error);
       toast({
         title: "Error generating diagnosis",
         description: "There was a problem analyzing your symptoms. Please try again.",
