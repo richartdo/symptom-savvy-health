@@ -27,27 +27,50 @@ export const generateDiagnosis = async (data: DiagnosisRequest): Promise<Diagnos
   console.log('Starting diagnosis generation with data:', data);
   
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-As a medical AI assistant, analyze the following patient information and provide a health assessment:
+You are a medical AI assistant. Based on the following patient symptoms, provide specific medical condition possibilities (not generic terms).
 
 Patient Information:
-- Name: ${data.name}
 - Age: ${data.age}
 - Symptoms: ${data.symptoms.join(', ')}
 - Additional Information: ${data.additionalInfo || 'None provided'}
-- Language: ${data.language || 'English'}
 
-Please provide a structured response in JSON format with:
-1. possibleConditions: Array of 2-3 possible conditions with name, probability (High/Moderate/Low), and description
-2. recommendations: Array of 4-5 practical recommendations
-3. urgencyLevel: Overall urgency (Low/Moderate/High)
-4. disclaimer: Medical disclaimer
+Analyze these symptoms and provide specific medical conditions that could cause this combination of symptoms. Consider:
+- Common diseases and infections that match these symptoms
+- Age-appropriate conditions
+- Regional/tropical diseases if relevant (malaria, dengue, etc.)
+- Gastrointestinal conditions, respiratory infections, viral/bacterial infections
+- Provide REAL medical condition names, not generic descriptions
 
-Important: This is for educational purposes only and should not replace professional medical advice.
+Respond ONLY with valid JSON in this exact format:
+{
+  "possibleConditions": [
+    {
+      "name": "Specific Medical Condition Name",
+      "probability": "High/Moderate/Low",
+      "description": "Brief medical description of this condition and why symptoms match"
+    }
+  ],
+  "recommendations": [
+    "Specific actionable medical recommendations",
+    "When to seek immediate care",
+    "Symptom monitoring advice",
+    "Treatment suggestions",
+    "Preventive measures"
+  ],
+  "urgencyLevel": "Low/Moderate/High",
+  "disclaimer": "This AI assessment is for informational purposes only and does not constitute medical advice. Please consult with a qualified healthcare professional for proper diagnosis and treatment."
+}
 
-Format your response as valid JSON only, without any markdown formatting or additional text.
+Examples of specific conditions to consider based on symptoms:
+- For fever + headache + fatigue: Malaria, Dengue fever, Viral infection, Bacterial infection
+- For abdominal pain + nausea: Gastroenteritis, Food poisoning, Appendicitis, Peptic ulcer
+- For cough + fever: Pneumonia, Bronchitis, COVID-19, Tuberculosis
+- For headache + fatigue: Migraine, Tension headache, Dehydration, Anemia
+
+Provide 2-3 most likely specific medical conditions based on the symptom combination.
 `;
 
     console.log('Sending request to Gemini API...');
@@ -93,36 +116,105 @@ Format your response as valid JSON only, without any markdown formatting or addi
   } catch (error) {
     console.error('Error generating diagnosis:', error);
     
-    // Return a fallback response instead of throwing
-    return {
-      possibleConditions: [
-        {
-          name: "General Health Concern",
-          probability: "Moderate",
-          description: "Based on the symptoms provided, this could be a common health issue that may require attention. The symptoms you've described warrant further evaluation."
-        },
-        {
-          name: "Stress-Related Symptoms",
-          probability: "Low",
-          description: "Physical symptoms can sometimes be related to stress or anxiety. Consider lifestyle factors that might be contributing."
-        }
-      ],
-      recommendations: [
-        "Monitor your symptoms closely and note any changes",
-        "Stay hydrated and get adequate rest",
-        "Consider consulting a healthcare professional if symptoms persist or worsen",
-        "Keep track of any triggers or patterns in your symptoms",
-        "Maintain a healthy diet and regular exercise routine if possible"
-      ],
-      urgencyLevel: "Moderate",
-      disclaimer: "This AI assessment is for informational purposes only and does not constitute medical advice. Please consult with a qualified healthcare professional for proper diagnosis and treatment."
-    };
+    // Create symptom-specific fallback based on user's actual symptoms
+    const symptomBasedFallback = createSymptomBasedFallback(data.symptoms);
+    return symptomBasedFallback;
   }
+};
+
+const createSymptomBasedFallback = (symptoms: string[]): DiagnosisResponse => {
+  const lowerSymptoms = symptoms.map(s => s.toLowerCase());
+  
+  // Generate specific conditions based on symptom patterns
+  let conditions = [];
+  let urgency = 'Moderate';
+  
+  if (lowerSymptoms.includes('fever') && lowerSymptoms.includes('headache')) {
+    conditions = [
+      {
+        name: "Viral Infection (Common Cold/Flu)",
+        probability: "High",
+        description: "A viral infection affecting the upper respiratory system, commonly causing fever and headaches along with other symptoms."
+      },
+      {
+        name: "Malaria",
+        probability: "Moderate",
+        description: "A mosquito-borne infectious disease that typically presents with fever, headache, and fatigue. Consider if you've been in malaria-endemic areas."
+      }
+    ];
+    urgency = 'Moderate';
+  } else if (lowerSymptoms.includes('abdominal pain') && lowerSymptoms.includes('nausea')) {
+    conditions = [
+      {
+        name: "Gastroenteritis",
+        probability: "High",
+        description: "Inflammation of the stomach and intestines, often caused by viral or bacterial infection, leading to abdominal pain and nausea."
+      },
+      {
+        name: "Food Poisoning",
+        probability: "Moderate",
+        description: "Illness caused by consuming contaminated food or water, typically resulting in gastrointestinal symptoms."
+      }
+    ];
+  } else if (lowerSymptoms.includes('cough') && lowerSymptoms.includes('fever')) {
+    conditions = [
+      {
+        name: "Pneumonia",
+        probability: "Moderate",
+        description: "Infection that inflames air sacs in one or both lungs, which may fill with fluid, causing cough and fever."
+      },
+      {
+        name: "Bronchitis",
+        probability: "High",
+        description: "Inflammation of the lining of bronchial tubes, which carry air to and from your lungs, causing persistent cough."
+      }
+    ];
+  } else if (lowerSymptoms.includes('headache') && lowerSymptoms.includes('fatigue')) {
+    conditions = [
+      {
+        name: "Tension Headache",
+        probability: "High",
+        description: "The most common type of headache, often related to stress, fatigue, or muscle tension around the head and neck."
+      },
+      {
+        name: "Migraine",
+        probability: "Moderate",
+        description: "A neurological condition that can cause severe throbbing pain, usually on one side of the head, often accompanied by fatigue."
+      }
+    ];
+  } else {
+    // Generic fallback for other symptom combinations
+    conditions = [
+      {
+        name: "Viral Syndrome",
+        probability: "Moderate",
+        description: "A collection of symptoms caused by viral infection, which can affect multiple body systems simultaneously."
+      },
+      {
+        name: "Stress-Related Physical Symptoms",
+        probability: "Low",
+        description: "Physical manifestations of psychological stress, which can present as various unexplained symptoms."
+      }
+    ];
+  }
+
+  return {
+    possibleConditions: conditions,
+    recommendations: [
+      "Monitor your symptoms closely and note any changes or worsening",
+      "Stay well-hydrated and get adequate rest to support your immune system",
+      "Take over-the-counter pain relievers as needed for symptom relief",
+      "Seek medical attention if symptoms persist for more than 3-5 days or worsen",
+      "Consider consulting a healthcare professional for proper diagnosis and treatment"
+    ],
+    urgencyLevel: urgency,
+    disclaimer: "This AI assessment is for informational purposes only and does not constitute medical advice. Please consult with a qualified healthcare professional for proper diagnosis and treatment."
+  };
 };
 
 export const translateText = async (text: string, targetLanguage: string = 'en'): Promise<string> => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `Translate the following text to ${targetLanguage}: "${text}"
     
@@ -139,7 +231,7 @@ export const translateText = async (text: string, targetLanguage: string = 'en')
 
 export const analyzeSignLanguageVideo = async (videoDescription: string): Promise<string[]> => {
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `Based on this sign language video description: "${videoDescription}"
     
